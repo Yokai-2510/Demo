@@ -1,6 +1,6 @@
 from datetime import datetime
 
-def strategy_evaluation(indicators, user_data):
+def entry_evaluation(indicators, user_data):
 
     # Check if current time is within the specified range (9:15 AM to 3:20 PM)
     current_time = datetime.now().time()
@@ -20,6 +20,27 @@ def strategy_evaluation(indicators, user_data):
             user_data['order_flag'] = True
             user_data['position_active'] = True
             return True
+
+
+def exit_evaluation(indicators, user_data):
+    broker = user_data['broker']
+    current_pnl = fetch_current_pnl(broker)  # Fetch current PnL (this function should be defined elsewhere)
+    current_time = datetime.now()
+
+    # Check conditions for exiting
+    if current_pnl >= 500:  # Stop Loss
+        user_data['position_active'] = False
+        return
+
+    if current_time >= datetime.strptime('15:20', '%H:%M'):  # Close position at 3:20 PM
+        user_data['position_active'] = False
+        return
+
+    if (indicators['RSI'] >= indicators['Smooth_MA'] + 5 and 
+        indicators['Stoch_RSI_K'] >= indicators['Stoch_RSI_D'] and 
+        indicators['Stoch_RSI_crossover'] is True):
+        user_data['position_active'] = False
+        return
 
 
 def instrument_key(live_data, user_data, order_details):
