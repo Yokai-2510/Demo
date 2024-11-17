@@ -3,7 +3,7 @@ import threading
 import time
 
 from indicators import fetch_indicators
-from s1_evaluation import instrument_key ,strategy_evaluation
+from s1_evaluation import instrument_key ,entry_evaluation, exit_evaluation
 
 
 # Initialize dictionaries
@@ -45,7 +45,10 @@ indicator_thread.start()
 while True : 
     
     time.sleep(float(user_config['sleep_interval']))
-    if strategy_evaluation(indicators, user_data) == True :
+    
+    if entry_evaluation(indicators, user_data) == True :
         instrument_key(live_data, user_data, order_details)
         place_order(user_data,order_details)
+    if exit_evaluation(indicators ,user_data ) :
+        place_order(user_data,order_details)    
 
